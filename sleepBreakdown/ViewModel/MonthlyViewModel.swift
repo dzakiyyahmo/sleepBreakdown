@@ -5,7 +5,7 @@ import HealthKit
 @MainActor
 class MonthlyViewModel: ObservableObject {
     private let healthKitManager = HealthKitManager()
-    private let modelContext: ModelContext
+    let modelContext: ModelContext
     
     @Published var monthlyData: [SleepData] = []
     @Published var currentMonthStart: Date
@@ -69,6 +69,7 @@ class MonthlyViewModel: ObservableObject {
                      remSleep,
                      coreSleep,
                      deepSleep,
+                     unspecifiedSleep,
                      awakeTime,
                      firstSleep,
                      lastSleep) = await healthKitManager.fetchSleepData(for: date)
@@ -78,6 +79,7 @@ class MonthlyViewModel: ObservableObject {
                 sleepData.remSleepDuration = remSleep
                 sleepData.coreSleepDuration = coreSleep
                 sleepData.deepSleepDuration = deepSleep
+                sleepData.unspecifiedSleepDuration = unspecifiedSleep
                 sleepData.awakeDuration = awakeTime
                 sleepData.sleepStart = firstSleep
                 sleepData.sleepEnd = lastSleep

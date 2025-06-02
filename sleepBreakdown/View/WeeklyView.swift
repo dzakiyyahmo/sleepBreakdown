@@ -12,6 +12,41 @@ struct WeeklyView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
+                //MARK: --Display the prediction
+                VStack(spacing: 5) {
+                    Text("Predicted Restedness for Next Week:")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                    
+                    // Display the prediction if available
+                    if let prediction = viewModel.predictedRestednessForNextWeek {
+                        Text(String(format: "%.1f / 1.0", prediction)) //
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .foregroundColor(.purple) // Make it stand out
+                    }
+                    // Handle cases where prediction is not available
+                    else if viewModel.predictedRestednessForNextWeek == nil && viewModel.predictionErrorMessage == nil {
+                        // This case means no prediction, AND no general error yet.
+                        // Implies data might be missing from previous week or still loading.
+                        Text("No data from previous week for prediction.")
+                            .foregroundColor(.secondary)
+                    }
+                    // Display general error message if there is one
+                    else if let error = viewModel.predictionErrorMessage {
+                        Text(error)
+                            .foregroundColor(.red)
+                            .font(.caption)
+                            .multilineTextAlignment(.center)
+                    }
+                    // Default loading state
+                    else {
+                        Text("Calculating prediction...")
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .padding(.bottom) // Add some space below the prediction
+                
                 // Week Navigation
                 weekNavigationView
                 
@@ -122,12 +157,12 @@ struct WeeklyView: View {
             }
             
             // Deep Sleep Percentage
-//            StatCard(
-//                title: "Deep Sleep",
-//                value: viewModel.getFormattedPercentage(for: viewModel.averageDeepSleepPercentage),
-//                icon: "percent",
-//                color: .purple
-//            )
+            //            StatCard(
+            //                title: "Deep Sleep",
+            //                value: viewModel.getFormattedPercentage(for: viewModel.averageDeepSleepPercentage),
+            //                icon: "percent",
+            //                color: .purple
+            //            )
         }
         .padding()
         .background(
@@ -175,7 +210,8 @@ struct WeeklyView: View {
                 DailySleepCard(
                     sleepData: data,
                     viewModel: viewModel,
-                    durationFormatter: viewModel.getFormattedDuration
+                    durationFormatter: viewModel.getFormattedDuration,
+                    modelContext: viewModel.modelContext
                 )
             }
         }
@@ -188,4 +224,4 @@ extension TimeInterval {
         let minutes = Int((self.truncatingRemainder(dividingBy: 3600)) / 60)
         return "\(hours)h \(minutes)m"
     }
-} 
+}

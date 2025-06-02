@@ -6,8 +6,8 @@ class HealthKitManager {
     
     func requestAuthorization() async -> Bool {
         guard HKHealthStore.isHealthDataAvailable(),
-              let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else { 
-            return false 
+              let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else {
+            return false
         }
         
         do {
@@ -20,14 +20,15 @@ class HealthKitManager {
     }
     
     func fetchSleepData(for date: Date) async -> (totalSleep: TimeInterval,
-                                                 remSleep: TimeInterval,
-                                                 coreSleep: TimeInterval,
-                                                 deepSleep: TimeInterval,
-                                                 awakeTime: TimeInterval,
-                                                 firstSleep: Date?,
-                                                 lastSleep: Date?) {
+                                                  remSleep: TimeInterval,
+                                                  coreSleep: TimeInterval,
+                                                  deepSleep: TimeInterval,
+                                                  unspecifiedSleep: TimeInterval,
+                                                  awakeTime: TimeInterval,
+                                                  firstSleep: Date?,
+                                                  lastSleep: Date?) {
         guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else {
-            return (0, 0, 0, 0, 0, nil, nil)
+            return (0, 0, 0, 0, 0, 0, nil, nil)
         }
         
         let calendar = Calendar.current
@@ -36,16 +37,16 @@ class HealthKitManager {
         let previousDayEvening = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: previousDay)!
         
         let predicate = HKQuery.predicateForSamples(withStart: previousDayEvening,
-                                                   end: noon,
-                                                   options: [])
+                                                    end: noon,
+                                                    options: [])
         
         return await withCheckedContinuation { continuation in
             let query = HKSampleQuery(sampleType: sleepType,
-                                    predicate: predicate,
-                                    limit: 0,
-                                    sortDescriptors: nil) { _, results, error in
+                                      predicate: predicate,
+                                      limit: 0,
+                                      sortDescriptors: nil) { _, results, error in
                 guard let samples = results as? [HKCategorySample], error == nil else {
-                    continuation.resume(returning: (0, 0, 0, 0, 0, nil, nil))
+                    continuation.resume(returning: (0, 0, 0, 0, 0, 0, nil, nil))
                     return
                 }
                 
@@ -57,6 +58,7 @@ class HealthKitManager {
                 var remSleep: TimeInterval = 0
                 var coreSleep: TimeInterval = 0
                 var deepSleep: TimeInterval = 0
+                var unspecifiedSleep: TimeInterval = 0
                 var awakeTime: TimeInterval = 0
                 
                 var firstSleep: Date?
@@ -86,6 +88,12 @@ class HealthKitManager {
                         if firstSleep == nil { firstSleep = sample.startDate }
                         lastSleep = sample.endDate
                         
+                    case HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue:
+                        unspecifiedSleep += duration
+                        totalSleep += duration
+                        if firstSleep == nil { firstSleep = sample.startDate }
+                        lastSleep = sample.endDate
+                        
                     case HKCategoryValueSleepAnalysis.awake.rawValue:
                         if firstSleep != nil {
                             awakeTime += duration
@@ -101,6 +109,7 @@ class HealthKitManager {
                     remSleep,
                     coreSleep,
                     deepSleep,
+                    unspecifiedSleep,
                     awakeTime,
                     firstSleep,
                     lastSleep
@@ -110,4 +119,4 @@ class HealthKitManager {
             self.healthStore.execute(query)
         }
     }
-} 
+}

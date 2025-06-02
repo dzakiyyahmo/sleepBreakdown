@@ -60,6 +60,7 @@ class DailyViewModel: ObservableObject {
              remSleep,
              coreSleep,
              deepSleep,
+             unspecifiedSleep,
              awakeTime,
              firstSleep,
              lastSleep) = await healthKitManager.fetchSleepData(for: currentDate)
@@ -70,6 +71,7 @@ class DailyViewModel: ObservableObject {
         sleepData.remSleepDuration = remSleep
         sleepData.coreSleepDuration = coreSleep
         sleepData.deepSleepDuration = deepSleep
+        sleepData.unspecifiedSleepDuration = unspecifiedSleep
         sleepData.awakeDuration = awakeTime
         sleepData.sleepStart = firstSleep
         sleepData.sleepEnd = lastSleep

@@ -176,7 +176,8 @@ struct MonthlyView: View {
                 DailySleepCard(
                     sleepData: data,
                     viewModel: viewModel,
-                    durationFormatter: viewModel.getFormattedDuration
+                    durationFormatter: viewModel.getFormattedDuration,
+                    modelContext: viewModel.modelContext
                 )
             }
         }
