@@ -4,7 +4,7 @@ import SwiftData
 
 @MainActor
 class DailyViewModel: ObservableObject {
-    private let healthStore = HKHealthStore()
+    private let healthKitManager = HealthKitManager()
     private let modelContext: ModelContext
     
     @Published var currentDate: Date = Date()
@@ -29,7 +29,9 @@ class DailyViewModel: ObservableObject {
         fetchStoredData()
         
         // Then fetch from HealthKit to ensure data is up to date
-        requestAndFetchFromHealthKit()
+        Task {
+            await requestAndFetchFromHealthKit()
+        }
     }
     
     private func fetchStoredData() {
@@ -51,112 +53,37 @@ class DailyViewModel: ObservableObject {
         }
     }
     
-    private func requestAndFetchFromHealthKit() {
-        guard HKHealthStore.isHealthDataAvailable(),
-              let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else { return }
+    private func requestAndFetchFromHealthKit() async {
+        guard await healthKitManager.requestAuthorization() else { return }
         
-        healthStore.requestAuthorization(toShare: [], read: [sleepType]) { [weak self] success, _ in
-            if success {
-                Task { @MainActor [weak self] in
-                    await self?.fetchSleepStages()
-                }
-            }
+        let (totalSleep,
+             remSleep,
+             coreSleep,
+             deepSleep,
+             awakeTime,
+             firstSleep,
+             lastSleep) = await healthKitManager.fetchSleepData(for: currentDate)
+        
+        // Create or update SleepData in SwiftData
+        let sleepData = self.sleepData ?? SleepData(date: currentDate)
+        sleepData.totalSleepDuration = totalSleep
+        sleepData.remSleepDuration = remSleep
+        sleepData.coreSleepDuration = coreSleep
+        sleepData.deepSleepDuration = deepSleep
+        sleepData.awakeDuration = awakeTime
+        sleepData.sleepStart = firstSleep
+        sleepData.sleepEnd = lastSleep
+        
+        if self.sleepData == nil {
+            modelContext.insert(sleepData)
         }
-    }
-    
-    private func fetchSleepStages() async {
-        guard let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else { return }
         
-        let calendar = Calendar.current
-        let noon = calendar.date(bySettingHour: 12, minute: 0, second: 0, of: currentDate)!
-        let previousDay = calendar.date(byAdding: .day, value: -1, to: currentDate)!
-        let previousDayEvening = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: previousDay)!
+        self.sleepData = sleepData
         
-        let predicate = HKQuery.predicateForSamples(withStart: previousDayEvening, end: noon, options: [])
-        
-        return await withCheckedContinuation { continuation in
-            let query = HKSampleQuery(sampleType: sleepType, predicate: predicate, limit: 0, sortDescriptors: nil) { [weak self] _, results, error in
-                guard let samples = results as? [HKCategorySample], error == nil else {
-                    continuation.resume()
-                    return
-                }
-                
-                let validSamples = samples.filter {
-                    $0.endDate > previousDayEvening && $0.startDate < noon
-                }.sorted { $0.startDate < $1.startDate }
-                
-                var totalSleep: TimeInterval = 0
-                var remSleep: TimeInterval = 0
-                var coreSleep: TimeInterval = 0
-                var deepSleep: TimeInterval = 0
-                var awakeTime: TimeInterval = 0
-                
-                var firstSleep: Date?
-                var lastSleep: Date?
-                
-                for sample in validSamples {
-                    let duration = sample.endDate.timeIntervalSince(sample.startDate)
-                    
-                    guard duration >= 60 else { continue }
-                    
-                    switch sample.value {
-                    case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
-                        remSleep += duration
-                        totalSleep += duration
-                        if firstSleep == nil { firstSleep = sample.startDate }
-                        lastSleep = sample.endDate
-                        
-                    case HKCategoryValueSleepAnalysis.asleepCore.rawValue:
-                        coreSleep += duration
-                        totalSleep += duration
-                        if firstSleep == nil { firstSleep = sample.startDate }
-                        lastSleep = sample.endDate
-                        
-                    case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
-                        deepSleep += duration
-                        totalSleep += duration
-                        if firstSleep == nil { firstSleep = sample.startDate }
-                        lastSleep = sample.endDate
-                        
-                    case HKCategoryValueSleepAnalysis.awake.rawValue:
-                        if firstSleep != nil {
-                            awakeTime += duration
-                        }
-                        
-                    default:
-                        break
-                    }
-                }
-                
-                Task { @MainActor [weak self] in
-                    guard let self = self else { return }
-                    // Create or update SleepData in SwiftData
-                    let sleepData = self.sleepData ?? SleepData(date: self.currentDate)
-                    sleepData.totalSleepDuration = totalSleep
-                    sleepData.remSleepDuration = remSleep
-                    sleepData.coreSleepDuration = coreSleep
-                    sleepData.deepSleepDuration = deepSleep
-                    sleepData.awakeDuration = awakeTime
-                    sleepData.sleepStart = firstSleep
-                    sleepData.sleepEnd = lastSleep
-                    
-                    if self.sleepData == nil {
-                        self.modelContext.insert(sleepData)
-                    }
-                    
-                    self.sleepData = sleepData
-                    
-                    do {
-                        try self.modelContext.save()
-                    } catch {
-                        print("Error saving sleep data: \(error)")
-                    }
-                    
-                    continuation.resume()
-                }
-            }
-            
-            self.healthStore.execute(query)
+        do {
+            try modelContext.save()
+        } catch {
+            print("Error saving sleep data: \(error)")
         }
     }
     

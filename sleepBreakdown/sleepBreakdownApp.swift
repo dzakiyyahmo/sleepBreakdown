@@ -22,7 +22,22 @@ struct SleepBreakdownApp: App {
     
     var body: some Scene {
         WindowGroup {
-            DailyView(modelContext: container.mainContext)
+            TabView {
+                DailyView(modelContext: container.mainContext)
+                    .tabItem {
+                        Label("Daily", systemImage: "clock")
+                    }
+                
+                WeeklyView(modelContext: container.mainContext)
+                    .tabItem {
+                        Label("Weekly", systemImage: "calendar")
+                    }
+                
+                MonthlyView(modelContext: container.mainContext)
+                    .tabItem {
+                        Label("Monthly", systemImage: "calendar.badge.clock")
+                    }
+            }
         }
         .modelContainer(container)
     }
