@@ -6,12 +6,24 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
-struct sleepBreakdownApp: App {
+struct SleepBreakdownApp: App {
+    let container: ModelContainer
+    
+    init() {
+        do {
+            container = try ModelContainer(for: SleepData.self)
+        } catch {
+            fatalError("Failed to initialize ModelContainer: \(error)")
+        }
+    }
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            DailyView(modelContext: container.mainContext)
         }
+        .modelContainer(container)
     }
 }
