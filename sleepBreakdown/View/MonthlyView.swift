@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import Charts
+import Orb
 
 struct MonthlyView: View {
     @StateObject private var viewModel: MonthlyViewModel
@@ -12,6 +13,10 @@ struct MonthlyView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
+                
+                //MARK: Orb with
+                CustomOrbComponent(preset: viewModel.orbPreset, size: 150)
+                
                 // Month Navigation
                 monthNavigationView
                 

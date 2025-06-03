@@ -10,6 +10,18 @@ class MonthlyViewModel: ObservableObject {
     @Published var monthlyData: [SleepData] = []
     @Published var currentMonthStart: Date
     
+    var orbPreset: OrbPreset {
+        let hoursOfSleep = averageSleepDuration / 3600
+        switch hoursOfSleep {
+        case 8...:
+            return .ocean
+        case 5..<8:
+            return .cosmic
+        default:
+            return .sunset
+        }
+    }
+    
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
         self.currentMonthStart = Calendar.current.startOfMonth(for: Date())
