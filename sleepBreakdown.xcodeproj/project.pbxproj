@@ -7,10 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		802095F32DEE76CB00D8CA96 /* Orb in Frameworks */ = {isa = PBXBuildFile; productRef = 802095F22DEE76CB00D8CA96 /* Orb */; };
-		805DC3302DEDA37B0051F352 /* Orb in Frameworks */ = {isa = PBXBuildFile; productRef = 805DC32F2DEDA37B0051F352 /* Orb */; };
-		805DC3332DEDA3960051F352 /* Orb in Frameworks */ = {isa = PBXBuildFile; productRef = 805DC3322DEDA3960051F352 /* Orb */; };
-		805DC3362DEDA3E90051F352 /* Orb in Frameworks */ = {isa = PBXBuildFile; productRef = 805DC3352DEDA3E90051F352 /* Orb */; };
+		40FA338D2DEE82B900267B4D /* Orb in Frameworks */ = {isa = PBXBuildFile; productRef = 40FA338C2DEE82B900267B4D /* Orb */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,10 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				805DC3362DEDA3E90051F352 /* Orb in Frameworks */,
-				805DC3332DEDA3960051F352 /* Orb in Frameworks */,
-				802095F32DEE76CB00D8CA96 /* Orb in Frameworks */,
-				805DC3302DEDA37B0051F352 /* Orb in Frameworks */,
+				40FA338D2DEE82B900267B4D /* Orb in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -123,10 +117,7 @@
 			);
 			name = sleepBreakdown;
 			packageProductDependencies = (
-				805DC32F2DEDA37B0051F352 /* Orb */,
-				805DC3322DEDA3960051F352 /* Orb */,
-				805DC3352DEDA3E90051F352 /* Orb */,
-				802095F22DEE76CB00D8CA96 /* Orb */,
+				40FA338C2DEE82B900267B4D /* Orb */,
 			);
 			productName = sleepBreakdown;
 			productReference = 40630D542DE8320E00355273 /* sleepBreakdown.app */;
@@ -211,7 +202,7 @@
 			mainGroup = 40630D4B2DE8320E00355273;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				802095F12DEE76CB00D8CA96 /* XCLocalSwiftPackageReference "../../Downloads/Orb-main" */,
+				40FA338B2DEE82B900267B4D /* XCLocalSwiftPackageReference "../../../Downloads/Orb-main" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 40630D552DE8320E00355273 /* Products */;
@@ -416,7 +407,7 @@
 				CODE_SIGN_ENTITLEMENTS = sleepBreakdown/sleepBreakdown.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = C2ZR92V3RZ;
+				DEVELOPMENT_TEAM = VW8399GFCK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "Health Record Usage";
@@ -426,13 +417,12 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.fazry2025.sleepBreakdown;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kiya.sleepBreakdown;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -448,7 +438,7 @@
 				CODE_SIGN_ENTITLEMENTS = sleepBreakdown/sleepBreakdown.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = C2ZR92V3RZ;
+				DEVELOPMENT_TEAM = VW8399GFCK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "Health Record Usage";
@@ -458,13 +448,12 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.fazry2025.sleepBreakdown;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kiya.sleepBreakdown;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -586,26 +575,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		802095F12DEE76CB00D8CA96 /* XCLocalSwiftPackageReference "../../Downloads/Orb-main" */ = {
+		40FA338B2DEE82B900267B4D /* XCLocalSwiftPackageReference "../../../Downloads/Orb-main" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../Downloads/Orb-main";
+			relativePath = "../../../Downloads/Orb-main";
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		802095F22DEE76CB00D8CA96 /* Orb */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Orb;
-		};
-		805DC32F2DEDA37B0051F352 /* Orb */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Orb;
-		};
-		805DC3322DEDA3960051F352 /* Orb */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Orb;
-		};
-		805DC3352DEDA3E90051F352 /* Orb */ = {
+		40FA338C2DEE82B900267B4D /* Orb */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Orb;
 		};

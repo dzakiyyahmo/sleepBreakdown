@@ -45,6 +45,35 @@ struct DailyView: View {
                 .animation(.easeOut, value: viewModel.currentDate)
             
             Spacer()
+            ZStack{
+                PredictCard() // Your custom background card
+                VStack {
+                    Text("Predicted Restedness for Tomorrow") // More descriptive title
+                        .font(.headline) // Adjusted font
+                        .foregroundStyle(.white)
+                    
+                    // Display the predictedRestednessForTomorrow from the ViewModel
+                    if let predictedRestedness = viewModel.predictedRestednessForTomorrow {
+                        Text("\(predictedRestedness, specifier: "%.0f")%") // Format as a percentage with no decimal places
+                            .font(.largeTitle) // Make it prominent
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+                    } else if let errorMessage = viewModel.dailyPredictionErrorMessage {
+                        Text("Error: \(errorMessage)") // Show error if prediction failed
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal) // Add some padding for better readability
+                    } else {
+                        // Show a placeholder or loading state if no prediction yet
+                        Text("— %") // Or "Loading..."
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white.opacity(0.7))
+                    }
+                }
+            }
+            
         }
         .padding()
         .onAppear {
@@ -78,29 +107,29 @@ struct DailyView: View {
             
             if let sleepData = viewModel.sleepData {
                 SleepStageRow(title: "Total Sleep",
-                             duration: sleepData.totalSleepDuration,
-                             color: .blue,
-                             viewModel: viewModel)
+                              duration: sleepData.totalSleepDuration,
+                              color: .blue,
+                              viewModel: viewModel)
                 
                 SleepStageRow(title: "REM Sleep",
-                             duration: sleepData.remSleepDuration,
-                             color: .purple,
-                             viewModel: viewModel)
+                              duration: sleepData.remSleepDuration,
+                              color: .purple,
+                              viewModel: viewModel)
                 
                 SleepStageRow(title: "Core Sleep",
-                             duration: sleepData.coreSleepDuration,
-                             color: .indigo,
-                             viewModel: viewModel)
+                              duration: sleepData.coreSleepDuration,
+                              color: .indigo,
+                              viewModel: viewModel)
                 
                 SleepStageRow(title: "Deep Sleep",
-                             duration: sleepData.deepSleepDuration,
-                             color: .teal,
-                             viewModel: viewModel)
+                              duration: sleepData.deepSleepDuration,
+                              color: .teal,
+                              viewModel: viewModel)
                 
                 SleepStageRow(title: "Time Awake",
-                             duration: sleepData.awakeDuration,
-                             color: .orange,
-                             viewModel: viewModel)
+                              duration: sleepData.awakeDuration,
+                              color: .orange,
+                              viewModel: viewModel)
             } else {
                 Text("No sleep data available")
                     .foregroundColor(.secondary)
@@ -114,6 +143,8 @@ struct DailyView: View {
         )
     }
 }
+
+
 
 struct SleepStageRow: View {
     let title: String
@@ -147,4 +178,4 @@ struct SleepStageRow: View {
     } catch {
         return Text("Failed to create preview: \(error.localizedDescription)")
     }
-} 
+}
