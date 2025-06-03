@@ -16,7 +16,19 @@ class WeeklyViewModel: ObservableObject {
     @Published var predictedRestednessForNextWeek: Double?
     
     @Published var predictionErrorMessage: String? // General error message for data loading/prediction
-
+    
+    var orbPreset: OrbPreset {
+        let hoursOfSleep = averageSleepDuration / 3600
+        switch hoursOfSleep {
+        case 8...:
+            return .ocean
+        case 5..<8:
+            return .cosmic
+        default:
+            return .sunset
+        }
+    }
+    
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
         self.currentWeekStart = Calendar.current.startOfWeek(for: Date()) // Start with current week

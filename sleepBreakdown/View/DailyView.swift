@@ -10,6 +10,7 @@ struct DailyView: View {
     
     var body: some View {
         VStack(spacing: 20) {
+            CustomOrbComponent(preset: viewModel.orbPreset, size: 150)
             // Date Navigation
             HStack {
                 // Previous Day Button

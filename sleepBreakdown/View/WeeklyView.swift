@@ -21,82 +21,84 @@ struct WeeklyView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // MARK: -- Orb View based on prediction score
-                if let prediction = viewModel.predictedRestednessForNextWeek {
-                    OrbView(configuration: orbConfiguration(for: prediction))
-                        .frame(width: 150, height: 150) // Adjust size as needed
-                        .padding(.top) // Add padding above the orb
-                } else {
-                    // Default orb or placeholder if prediction is not available
-                    OrbView(configuration: shadowOrb) // Use shadowOrb configuration when no data
-                        .frame(width: 150, height: 150)
-                        .padding(.top)
-                }
                 
-                // MARK: -- Display the prediction card with background image
-                if let prediction = viewModel.predictedRestednessForNextWeek {
-                    let percentage = ((prediction + 1) / 2) * 100 // Convert to percentage
-                    let imageName = backgroundCardImageName(for: percentage)
-                    
-                    ZStack {
-                        // Background Image
-                        Image(imageName)
-                            .resizable()
-                            .frame(width: 326, height: 126)
-                            .cornerRadius(15) // Match the card style in the image
-                        
-                        VStack(alignment: .leading, spacing: 0) { // Main VStack for all text content
-                            
-                            HStack(alignment: .top) { // HStack for title and percentage in the top section
-                                VStack(alignment: .leading) { // VStack specifically for the title
-                                    Text("Prediction Restedness \nfor Next Week") // Title with manual line break
-                                        .font(.headline)
-                                        .foregroundColor(.white)
-                                        .padding(.top, 15)
-                                        .padding(.leading, 15)// Padding above the title
-                                        .fixedSize(horizontal: false, vertical: true) // Allow text to wrap
-                                }
-                                
-                                Spacer() // Push percentage to the right
-                                
-                                Text(String(format: "%.0f%%", percentage)) // Percentage text
-                                    .font(.system(size: 45, weight: .bold)) // Large font for percentage
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.white)
-                                    .padding(.top, 25) // Increased padding above percentage to push it down more
-                                    .padding(.trailing, 20) // Padding on the right
-                            }
-                            
-                            Divider() // Horizontal divider line
-                                .background(Color.white.opacity(0.5)) // Make divider visible
-                                .padding(.horizontal, 20) // Add horizontal padding to divider
-                                .padding(.top, 8) // Increased space above divider
-                                .padding(.bottom, 8) // Increased space below divider
-                            
-                            Text(restednessMessage(for: percentage)) // Message text
-                                .font(.caption)
-                                .foregroundColor(.white)
-                                .multilineTextAlignment(.center)
-                                .frame(maxWidth: .infinity, alignment: .center) // Ensure message is centered
-                                .padding(.horizontal, 20) // Add horizontal padding to message
-                                .padding(.top, 2) // Keep padding above the message (distance from divider)
-                                .padding(.bottom, 15) // Padding below the message
-                                .fixedSize(horizontal: false, vertical: true) // Allow text to wrap
-                            
-                        }
-                        // Removed frame and padding from the outer VStack, padding handled by elements inside
-                        // .padding(.horizontal, 20)
-                        // .frame(width: 326, height: 126, alignment: .leading)
-                    }
-                    // Frame applied to ZStack to control card size
-                    .frame(width: 326, height: 126)
-                    .padding(.top) // Padding above the card
-                } else {
-                    // Display loading or no data message if prediction is not available
-                    Text(viewModel.predictionErrorMessage ?? "Calculating prediction...")
-                        .foregroundColor(.secondary)
-                        .padding(.top)
-                }
+                CustomOrbComponent(preset: viewModel.orbPreset, size: 150)
+//                // MARK: -- Orb View based on prediction score
+//                if let prediction = viewModel.predictedRestednessForNextWeek {
+//                    OrbView(configuration: orbConfiguration(for: prediction))
+//                        .frame(width: 150, height: 150) // Adjust size as needed
+//                        .padding(.top) // Add padding above the orb
+//                } else {
+//                    // Default orb or placeholder if prediction is not available
+//                    OrbView(configuration: shadowOrb) // Use shadowOrb configuration when no data
+//                        .frame(width: 150, height: 150)
+//                        .padding(.top)
+//                }
+//                
+//                // MARK: -- Display the prediction card with background image
+//                if let prediction = viewModel.predictedRestednessForNextWeek {
+//                    let percentage = ((prediction + 1) / 2) * 100 // Convert to percentage
+//                    let imageName = backgroundCardImageName(for: percentage)
+//                    
+//                    ZStack {
+//                        // Background Image
+//                        Image(imageName)
+//                            .resizable()
+//                            .frame(width: 326, height: 126)
+//                            .cornerRadius(15) // Match the card style in the image
+//                        
+//                        VStack(alignment: .leading, spacing: 0) { // Main VStack for all text content
+//                            
+//                            HStack(alignment: .top) { // HStack for title and percentage in the top section
+//                                VStack(alignment: .leading) { // VStack specifically for the title
+//                                    Text("Prediction Restedness \nfor Next Week") // Title with manual line break
+//                                        .font(.headline)
+//                                        .foregroundColor(.white)
+//                                        .padding(.top, 15)
+//                                        .padding(.leading, 15)// Padding above the title
+//                                        .fixedSize(horizontal: false, vertical: true) // Allow text to wrap
+//                                }
+//                                
+//                                Spacer() // Push percentage to the right
+//                                
+//                                Text(String(format: "%.0f%%", percentage)) // Percentage text
+//                                    .font(.system(size: 45, weight: .bold)) // Large font for percentage
+//                                    .fontWeight(.bold)
+//                                    .foregroundColor(.white)
+//                                    .padding(.top, 25) // Increased padding above percentage to push it down more
+//                                    .padding(.trailing, 20) // Padding on the right
+//                            }
+//                            
+//                            Divider() // Horizontal divider line
+//                                .background(Color.white.opacity(0.5)) // Make divider visible
+//                                .padding(.horizontal, 20) // Add horizontal padding to divider
+//                                .padding(.top, 8) // Increased space above divider
+//                                .padding(.bottom, 8) // Increased space below divider
+//                            
+//                            Text(restednessMessage(for: percentage)) // Message text
+//                                .font(.caption)
+//                                .foregroundColor(.white)
+//                                .multilineTextAlignment(.center)
+//                                .frame(maxWidth: .infinity, alignment: .center) // Ensure message is centered
+//                                .padding(.horizontal, 20) // Add horizontal padding to message
+//                                .padding(.top, 2) // Keep padding above the message (distance from divider)
+//                                .padding(.bottom, 15) // Padding below the message
+//                                .fixedSize(horizontal: false, vertical: true) // Allow text to wrap
+//                            
+//                        }
+//                        // Removed frame and padding from the outer VStack, padding handled by elements inside
+//                        // .padding(.horizontal, 20)
+//                        // .frame(width: 326, height: 126, alignment: .leading)
+//                    }
+//                    // Frame applied to ZStack to control card size
+//                    .frame(width: 326, height: 126)
+//                    .padding(.top) // Padding above the card
+//                } else {
+//                    // Display loading or no data message if prediction is not available
+//                    Text(viewModel.predictionErrorMessage ?? "Calculating prediction...")
+//                        .foregroundColor(.secondary)
+//                        .padding(.top)
+//                }
                 
                 // Week Navigation
                 weekNavigationView

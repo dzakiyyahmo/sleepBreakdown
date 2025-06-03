@@ -14,6 +14,18 @@ class DailyViewModel: ObservableObject {
     @Published var predictedRestednessForTomorrow: Double? // Stores the ML prediction result
     @Published var dailyPredictionErrorMessage: String? // Stores ML-specific error messages
     
+    var orbPreset: OrbPreset {
+        let hoursOfSleep = (sleepData?.totalSleepDuration ?? 0) / 3600
+        switch hoursOfSleep {
+        case 8...:
+            return .ocean
+        case 5..<8:
+            return .cosmic
+        default:
+            return .sunset
+        }
+    }
+    
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
         
@@ -33,13 +45,13 @@ class DailyViewModel: ObservableObject {
             dailyPredictionErrorMessage = "Prediction service not available."
             return
         }
-            
+        
         guard let sleepEntry = todaySleepData, sleepEntry.totalSleepDuration > 0 else {
             predictedRestednessForTomorrow = nil
             dailyPredictionErrorMessage = "Not enough valid sleep data for today to make a prediction for tomorrow."
             return
         }
-            
+        
         do {
             let prediction = try predictionService.predictRestedness(
                 awake: sleepEntry.awakeDuration,
@@ -89,13 +101,13 @@ class DailyViewModel: ObservableObject {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: currentDate)
         let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
-            
+        
         let predicate = #Predicate<SleepData> { sleepData in
             sleepData.date >= startOfDay && sleepData.date < endOfDay
         }
-            
+        
         let descriptor = FetchDescriptor<SleepData>(predicate: predicate)
-            
+        
         do {
             let results = try modelContext.fetch(descriptor)
             self.sleepData = results.first
@@ -103,10 +115,10 @@ class DailyViewModel: ObservableObject {
             print("Error fetching stored sleep data: \(error)")
         }
     }
-        
+    
     private func requestAndFetchFromHealthKit() async {
         guard await healthKitManager.requestAuthorization() else { return }
-            
+        
         let (totalSleep,
              remSleep,
              coreSleep,
@@ -115,7 +127,7 @@ class DailyViewModel: ObservableObject {
              awakeTime,
              firstSleep,
              lastSleep) = await healthKitManager.fetchSleepData(for: currentDate)
-            
+        
         // Create or update SleepData in SwiftData
         let sleepDataToSave: SleepData
         if let existingSleepData = self.sleepData {
@@ -124,7 +136,7 @@ class DailyViewModel: ObservableObject {
             sleepDataToSave = SleepData(date: currentDate)
             modelContext.insert(sleepDataToSave)
         }
-
+        
         sleepDataToSave.totalSleepDuration = totalSleep
         sleepDataToSave.remSleepDuration = remSleep
         sleepDataToSave.coreSleepDuration = coreSleep
@@ -133,16 +145,16 @@ class DailyViewModel: ObservableObject {
         sleepDataToSave.awakeDuration = awakeTime
         sleepDataToSave.sleepStart = firstSleep
         sleepDataToSave.sleepEnd = lastSleep
-            
+        
         self.sleepData = sleepDataToSave // Crucially update the published property
-            
+        
         do {
             try modelContext.save()
         } catch {
             print("Error saving sleep data: \(error)")
         }
     }
-        
+    
     private func performPredictionIfNeeded() {
         let calendar = Calendar.current
         if calendar.isDateInToday(currentDate) {
@@ -152,7 +164,7 @@ class DailyViewModel: ObservableObject {
             dailyPredictionErrorMessage = nil
         }
     }
-        
+    
     func getFormattedDuration(for duration: TimeInterval) -> String {
         let hours = Int(duration / 3600)
         let minutes = Int((duration.truncatingRemainder(dividingBy: 3600)) / 60)
