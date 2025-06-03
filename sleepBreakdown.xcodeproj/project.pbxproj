@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		802095F32DEE76CB00D8CA96 /* Orb in Frameworks */ = {isa = PBXBuildFile; productRef = 802095F22DEE76CB00D8CA96 /* Orb */; };
+		802096392DEEBD9500D8CA96 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 802096382DEEBD9500D8CA96 /* Launch Screen.storyboard */; };
 		805DC3302DEDA37B0051F352 /* Orb in Frameworks */ = {isa = PBXBuildFile; productRef = 805DC32F2DEDA37B0051F352 /* Orb */; };
 		805DC3332DEDA3960051F352 /* Orb in Frameworks */ = {isa = PBXBuildFile; productRef = 805DC3322DEDA3960051F352 /* Orb */; };
 		805DC3362DEDA3E90051F352 /* Orb in Frameworks */ = {isa = PBXBuildFile; productRef = 805DC3352DEDA3E90051F352 /* Orb */; };
@@ -34,6 +35,7 @@
 		40630D542DE8320E00355273 /* sleepBreakdown.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = sleepBreakdown.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		40630D612DE8320F00355273 /* sleepBreakdownTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = sleepBreakdownTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		40630D6B2DE8320F00355273 /* sleepBreakdownUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = sleepBreakdownUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		802096382DEEBD9500D8CA96 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -86,6 +88,7 @@
 		40630D4B2DE8320E00355273 = {
 			isa = PBXGroup;
 			children = (
+				802096382DEEBD9500D8CA96 /* Launch Screen.storyboard */,
 				40630D562DE8320E00355273 /* sleepBreakdown */,
 				40630D642DE8320F00355273 /* sleepBreakdownTests */,
 				40630D6E2DE8320F00355273 /* sleepBreakdownUITests */,
@@ -230,6 +233,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				802096392DEEBD9500D8CA96 /* Launch Screen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -413,6 +417,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = sleepBreakdown/sleepBreakdown.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -424,6 +429,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
@@ -445,6 +451,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_ENTITLEMENTS = sleepBreakdown/sleepBreakdown.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -456,6 +463,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
