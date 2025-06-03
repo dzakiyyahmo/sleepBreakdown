@@ -1,9 +1,18 @@
 import SwiftUI
 import SwiftData
 import Charts
+import Orb
 
 struct WeeklyView: View {
     @StateObject private var viewModel: WeeklyViewModel
+    
+    // Define shadowOrb configuration
+    private let shadowOrb = OrbConfiguration(
+        backgroundColors: [.black, .gray],
+        glowColor: .gray,
+        coreGlowIntensity: 0.7,
+        showParticles: false
+    )
     
     init(modelContext: ModelContext) {
         _viewModel = StateObject(wrappedValue: WeeklyViewModel(modelContext: modelContext))
@@ -12,40 +21,82 @@ struct WeeklyView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                //MARK: --Display the prediction
-                VStack(spacing: 5) {
-                    Text("Predicted Restedness for Next Week:")
-                        .font(.headline)
-                        .foregroundColor(.secondary)
-                    
-                    // Display the prediction if available
-                    if let prediction = viewModel.predictedRestednessForNextWeek {
-                        Text(String(format: "%.1f / 1.0", prediction)) //
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(.purple) // Make it stand out
-                    }
-                    // Handle cases where prediction is not available
-                    else if viewModel.predictedRestednessForNextWeek == nil && viewModel.predictionErrorMessage == nil {
-                        // This case means no prediction, AND no general error yet.
-                        // Implies data might be missing from previous week or still loading.
-                        Text("No data from previous week for prediction.")
-                            .foregroundColor(.secondary)
-                    }
-                    // Display general error message if there is one
-                    else if let error = viewModel.predictionErrorMessage {
-                        Text(error)
-                            .foregroundColor(.red)
-                            .font(.caption)
-                            .multilineTextAlignment(.center)
-                    }
-                    // Default loading state
-                    else {
-                        Text("Calculating prediction...")
-                            .foregroundColor(.secondary)
-                    }
+                // MARK: -- Orb View based on prediction score
+                if let prediction = viewModel.predictedRestednessForNextWeek {
+                    OrbView(configuration: orbConfiguration(for: prediction))
+                        .frame(width: 150, height: 150) // Adjust size as needed
+                        .padding(.top) // Add padding above the orb
+                } else {
+                    // Default orb or placeholder if prediction is not available
+                    OrbView(configuration: shadowOrb) // Use shadowOrb configuration when no data
+                        .frame(width: 150, height: 150)
+                        .padding(.top)
                 }
-                .padding(.bottom) // Add some space below the prediction
+                
+                // MARK: -- Display the prediction card with background image
+                if let prediction = viewModel.predictedRestednessForNextWeek {
+                    let percentage = ((prediction + 1) / 2) * 100 // Convert to percentage
+                    let imageName = backgroundCardImageName(for: percentage)
+                    
+                    ZStack {
+                        // Background Image
+                        Image(imageName)
+                            .resizable()
+                            .frame(width: 326, height: 126)
+                            .cornerRadius(15) // Match the card style in the image
+                        
+                        VStack(alignment: .leading, spacing: 0) { // Main VStack for all text content
+                            
+                            HStack(alignment: .top) { // HStack for title and percentage in the top section
+                                VStack(alignment: .leading) { // VStack specifically for the title
+                                    Text("Prediction Restedness \nfor Next Week") // Title with manual line break
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+                                        .padding(.top, 15)
+                                        .padding(.leading, 15)// Padding above the title
+                                        .fixedSize(horizontal: false, vertical: true) // Allow text to wrap
+                                }
+                                
+                                Spacer() // Push percentage to the right
+                                
+                                Text(String(format: "%.0f%%", percentage)) // Percentage text
+                                    .font(.system(size: 45, weight: .bold)) // Large font for percentage
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white)
+                                    .padding(.top, 25) // Increased padding above percentage to push it down more
+                                    .padding(.trailing, 20) // Padding on the right
+                            }
+                            
+                            Divider() // Horizontal divider line
+                                .background(Color.white.opacity(0.5)) // Make divider visible
+                                .padding(.horizontal, 20) // Add horizontal padding to divider
+                                .padding(.top, 8) // Increased space above divider
+                                .padding(.bottom, 8) // Increased space below divider
+                            
+                            Text(restednessMessage(for: percentage)) // Message text
+                                .font(.caption)
+                                .foregroundColor(.white)
+                                .multilineTextAlignment(.center)
+                                .frame(maxWidth: .infinity, alignment: .center) // Ensure message is centered
+                                .padding(.horizontal, 20) // Add horizontal padding to message
+                                .padding(.top, 2) // Keep padding above the message (distance from divider)
+                                .padding(.bottom, 15) // Padding below the message
+                                .fixedSize(horizontal: false, vertical: true) // Allow text to wrap
+                            
+                        }
+                        // Removed frame and padding from the outer VStack, padding handled by elements inside
+                        // .padding(.horizontal, 20)
+                        // .frame(width: 326, height: 126, alignment: .leading)
+                    }
+                    // Frame applied to ZStack to control card size
+                    .frame(width: 326, height: 126)
+                    .padding(.top) // Padding above the card
+                } else {
+                    // Display loading or no data message if prediction is not available
+                    Text(viewModel.predictionErrorMessage ?? "Calculating prediction...")
+                        .foregroundColor(.secondary)
+                        .padding(.top)
+                }
                 
                 // Week Navigation
                 weekNavigationView
@@ -214,6 +265,59 @@ struct WeeklyView: View {
                     modelContext: viewModel.modelContext
                 )
             }
+        }
+    }
+    
+    // Function to determine the background card image name based on percentage
+    private func backgroundCardImageName(for percentage: Double) -> String {
+        if percentage < 68 { // Less than 68%
+            return "sunsetcard"
+        } else if percentage < 77 { // 68% to less than 77%
+            return "firecard"
+        } else { // 77% or more
+            return "oceancard"
+        }
+    }
+    
+    // Function to determine the message based on percentage
+    private func restednessMessage(for percentage: Double) -> String {
+        if percentage < 68 { // Less than 68% (corresponds to Sunset)
+            return "It's a bit low! \nYou are rather low in restedness score."
+        } else if percentage < 77 { // 68% to less than 77% (corresponds to Fire)
+            return "It's low! \nIf this pattern continues, seek physician."
+        } else { // 77% or more (corresponds to Ocean)
+            return "Keep this up! \nYou are well-rested this week."
+        }
+    }
+    
+    // Function to determine OrbConfiguration based on prediction score (-1 to 1)
+    private func orbConfiguration(for prediction: Double) -> OrbConfiguration {
+        // Convert prediction (-1 to 1) to percentage (0 to 100)
+        let percentage = ((prediction + 1) / 2) * 100
+        
+        // Logic based on percentage
+        if percentage < 68 { // Less than 33%
+            // Sunset configuration
+            return OrbConfiguration(
+                backgroundColors: [.orange, .red, .pink],
+                glowColor: .orange,
+                coreGlowIntensity: 0.8
+            )
+        } else if percentage < 77 { // 33% to less than 66%
+            // Fire configuration
+            return OrbConfiguration(
+                backgroundColors: [.red, .orange, .yellow],
+                glowColor: .orange,
+                coreGlowIntensity: 1.3,
+                speed: 80
+            )
+        } else { // 66% or more
+            // Ocean configuration
+            return OrbConfiguration(
+                backgroundColors: [.blue, .cyan, .teal],
+                glowColor: .cyan,
+                speed: 75
+            )
         }
     }
 }

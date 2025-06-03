@@ -10,50 +10,36 @@ import SwiftData
 
 @main
 struct SleepBreakdownApp: App {
-    @StateObject private var restednessViewModel: RestednessViewModel
     let container: ModelContainer
     
     init() {
-        let container: ModelContainer
         do {
             container = try ModelContainer(for: SleepData.self)
         } catch {
             fatalError("Failed to initialize ModelContainer: \(error)")
         }
-        self.container = container
-        self._restednessViewModel = StateObject(wrappedValue: RestednessViewModel(modelContext: container.mainContext))
     }
     
     var body: some Scene {
         WindowGroup {
-            ZStack {
-                TabView {
-                    DailyView(modelContext: container.mainContext)
-                        .tabItem {
-                            Label("Daily", systemImage: "clock")
-                        }
-                    
-                    WeeklyView(modelContext: container.mainContext)
-                        .tabItem {
-                            Label("Weekly", systemImage: "calendar")
-                        }
-                    
-                    MonthlyView(modelContext: container.mainContext)
-                        .tabItem {
-                            Label("Monthly", systemImage: "calendar.badge.clock")
-                        }
-                }
-                .task {
-                    await restednessViewModel.checkDailyRestednessInput()
-                }
+            // Use TabView for navigation
+            TabView {
+                DailyView(modelContext: container.mainContext)
+                    .tabItem {
+                        Label("Daily", systemImage: "calendar")
+                    }
                 
-                if restednessViewModel.showingRestednessInput {
-                    Color.black.opacity(0.3)
-                        .ignoresSafeArea()
-                    
-                    RestednessInputView(viewModel: restednessViewModel)
-                        .transition(.move(edge: .bottom))
-                }
+                // Use WeeklyView instead of a placeholder
+                WeeklyView(modelContext: container.mainContext)
+                    .tabItem {
+                        Label("Weekly", systemImage: "chart.bar")
+                    }
+                
+                // Placeholder for MonthlyView
+                MonthlyView(modelContext: container.mainContext)
+                    .tabItem {
+                        Label("Monthly", systemImage: "calendar.circle")
+                    }
             }
         }
         .modelContainer(container)
