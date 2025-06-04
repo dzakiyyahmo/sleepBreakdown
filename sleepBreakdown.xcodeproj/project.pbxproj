@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2D9FDA722DEED97F00DFB47D /* Orb in Frameworks */ = {isa = PBXBuildFile; productRef = 2D9FDA712DEED97F00DFB47D /* Orb */; };
 		40FA33FC2DEECF8200267B4D /* Orb in Frameworks */ = {isa = PBXBuildFile; productRef = 40FA338C2DEE82B900267B4D /* Orb */; };
 		802096392DEEBD9500D8CA96 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 802096382DEEBD9500D8CA96 /* Launch Screen.storyboard */; };
 /* End PBXBuildFile section */
@@ -58,6 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2D9FDA722DEED97F00DFB47D /* Orb in Frameworks */,
 				40FA33FC2DEECF8200267B4D /* Orb in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -121,6 +123,7 @@
 			name = sleepBreakdown;
 			packageProductDependencies = (
 				40FA338C2DEE82B900267B4D /* Orb */,
+				2D9FDA712DEED97F00DFB47D /* Orb */,
 			);
 			productName = sleepBreakdown;
 			productReference = 40630D542DE8320E00355273 /* sleepBreakdown.app */;
@@ -205,7 +208,7 @@
 			mainGroup = 40630D4B2DE8320E00355273;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				40FA338B2DEE82B900267B4D /* XCLocalSwiftPackageReference "../../../Downloads/Orb-main" */,
+				2D9FDA702DEED97F00DFB47D /* XCLocalSwiftPackageReference "../../../../Downloads/Orb-main" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 40630D552DE8320E00355273 /* Products */;
@@ -412,7 +415,7 @@
 				CODE_SIGN_ENTITLEMENTS = sleepBreakdown/sleepBreakdown.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = VW8399GFCK;
+				DEVELOPMENT_TEAM = 54U4LT49BA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "Health Record Usage";
@@ -428,7 +431,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kiya.sleepBreakdown;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kiya.example.sleepBreakdown;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -445,7 +448,7 @@
 				CODE_SIGN_ENTITLEMENTS = sleepBreakdown/sleepBreakdown.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = VW8399GFCK;
+				DEVELOPMENT_TEAM = 54U4LT49BA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "Health Record Usage";
@@ -461,7 +464,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kiya.sleepBreakdown;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kiya.example.sleepBreakdown;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -583,13 +586,17 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		40FA338B2DEE82B900267B4D /* XCLocalSwiftPackageReference "../../../Downloads/Orb-main" */ = {
+		2D9FDA702DEED97F00DFB47D /* XCLocalSwiftPackageReference "../../../../Downloads/Orb-main" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../../Downloads/Orb-main";
+			relativePath = "../../../../Downloads/Orb-main";
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		2D9FDA712DEED97F00DFB47D /* Orb */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Orb;
+		};
 		40FA338C2DEE82B900267B4D /* Orb */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Orb;
