@@ -170,4 +170,12 @@ class DailyViewModel: ObservableObject {
         let minutes = Int((duration.truncatingRemainder(dividingBy: 3600)) / 60)
         return "\(hours)h \(minutes)m"
     }
+    
+    func getFormattedRestedness(score: Double) -> String {
+            // Convert score from -1 to 1 range to 0-100% range
+            // Ensure score is clamped to -1 to 1 if it could ever be outside, though slider prevents this.
+            let clampedScore = max(-1.0, min(1.0, score))
+            let percentage = ((clampedScore + 1) / 2) * 100
+            return String(format: "%.0f%%", percentage)
+        }
 }

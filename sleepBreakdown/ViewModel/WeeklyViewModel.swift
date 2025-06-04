@@ -8,10 +8,10 @@ class WeeklyViewModel: ObservableObject {
     private let healthKitManager = HealthKitManager()
     let modelContext: ModelContext
     private var predictionService: RestednessPredictionService? // Remains optional
-
+    
     @Published var weeklyData: [SleepData] = [] // Data for the charts and daily breakdown (the week currently viewed)
     @Published var currentWeekStart: Date // The start date of the week currently being viewed
-
+    
     // RENAMED: This is the single prediction you want to display for the next week
     @Published var predictedRestednessForNextWeek: Double?
     
@@ -29,10 +29,27 @@ class WeeklyViewModel: ObservableObject {
         }
     }
     
+    var averageRestednessScore: Double {
+        // If RestednessViewModel.checkDailyRestednessInput still uses '0' as "not set",
+        // then those '0's might skew the average if not filtered.
+        // Assuming for now that scores in weeklyData are actual user inputs (-1 to 1).
+        // If '0' can mean "not set by user yet", you'd need to filter those out.
+        // For example, if you adopt SleepData.restednessScore: Double?
+        // let validScores = weeklyData.compactMap { $0.restednessScore }
+        // guard !validScores.isEmpty else { return 0 } // or some other indicator for N/A
+        // let totalScore = validScores.reduce(0, +)
+        // return totalScore / Double(validScores.count)
+        
+        // Current implementation, assuming all scores in weeklyData are valid (or 0 is a valid avg starting point):
+        guard !weeklyData.isEmpty else { return 0 }
+        let totalScore = weeklyData.reduce(0) { $0 + $1.restednessScore }
+        return totalScore / Double(weeklyData.count) // This will average values between -1 and 1.
+    }
+    
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
         self.currentWeekStart = Calendar.current.startOfWeek(for: Date()) // Start with current week
-
+        
         do {
             self.predictionService = try RestednessPredictionService()
             self.predictionErrorMessage = nil // Clear any previous errors on successful service init
@@ -42,7 +59,7 @@ class WeeklyViewModel: ObservableObject {
             self.predictionErrorMessage = "Prediction model unavailable: \(error.localizedDescription)"
         }
     }
-
+    
     // RENAMED AND MODIFIED: This function now calculates the prediction for the *next week* based on *passed data*
     private func calculatePredictedRestednessForNextWeek(basedOn dataForPrediction: [SleepData]) {
         guard let predictionService = predictionService else {
@@ -50,7 +67,7 @@ class WeeklyViewModel: ObservableObject {
             predictionErrorMessage = "Prediction service not available."
             return
         }
-
+        
         var dailyPredictions: [Double] = []
         // Only consider sleep entries that actually have some duration for prediction
         for sleepEntry in dataForPrediction where sleepEntry.totalSleepDuration > 0 { // <-- Uses passed dataForPrediction
@@ -68,7 +85,7 @@ class WeeklyViewModel: ObservableObject {
                 print("Error predicting restedness for \(sleepEntry.date) in previous week: \(error.localizedDescription)")
             }
         }
-
+        
         if !dailyPredictions.isEmpty {
             let averagePrediction = dailyPredictions.reduce(0, +) / Double(dailyPredictions.count)
             predictedRestednessForNextWeek = averagePrediction // <-- Updates the correct @Published property
@@ -99,7 +116,7 @@ class WeeklyViewModel: ObservableObject {
         // --- 1. Define date range for the CURRENTLY VIEWED week (for UI display) ---
         let currentWeekDisplayStart = calendar.startOfDay(for: currentWeekStart)
         let currentWeekDisplayEnd = calendar.date(byAdding: DateComponents(day: 7, second: -1), to: currentWeekDisplayStart)!
-
+        
         // --- 2. Define date range for the PREVIOUS week (for ML model input) ---
         guard let previousWeekPredictionStart = calendar.date(byAdding: .weekOfYear, value: -1, to: currentWeekStart) else {
             print("Could not determine previous week start date for prediction.")
@@ -109,8 +126,8 @@ class WeeklyViewModel: ObservableObject {
             return
         }
         let previousWeekPredictionEnd = calendar.date(byAdding: DateComponents(day: 7, second: -1), to: previousWeekPredictionStart)!
-
-
+        
+        
         // --- Fetch CURRENT week data from SwiftData ---
         let currentWeekDescriptor = FetchDescriptor<SleepData>(
             predicate: #Predicate<SleepData> { sleepData in
@@ -118,7 +135,7 @@ class WeeklyViewModel: ObservableObject {
             },
             sortBy: [SortDescriptor(\.date)]
         )
-
+        
         // --- Fetch PREVIOUS week data from SwiftData ---
         let previousWeekDescriptor = FetchDescriptor<SleepData>(
             predicate: #Predicate<SleepData> { sleepData in
@@ -126,28 +143,28 @@ class WeeklyViewModel: ObservableObject {
             },
             sortBy: [SortDescriptor(\.date)]
         )
-
+        
         do {
             let existingCurrentWeekData = try modelContext.fetch(currentWeekDescriptor)
             let existingPreviousWeekData = try modelContext.fetch(previousWeekDescriptor)
-
+            
             // --- HealthKit Synchronization ---
             // Identify all unique dates that might need fetching (from both current and previous weeks)
             var allRelevantDatesForSync: Set<Date> = Set()
             existingCurrentWeekData.forEach { allRelevantDatesForSync.insert(calendar.startOfDay(for: $0.date)) }
             existingPreviousWeekData.forEach { allRelevantDatesForSync.insert(calendar.startOfDay(for: $0.date)) }
-
+            
             let datesToCover = weekDates(from: currentWeekDisplayStart, count: 7) + weekDates(from: previousWeekPredictionStart, count: 7)
             
             let missingDatesToFetch = datesToCover.filter { date in
                 !allRelevantDatesForSync.contains(calendar.startOfDay(for: date))
             }
-
+            
             // Fetch missing data from HealthKit and insert into SwiftData
             for date in missingDatesToFetch {
                 // Assuming your HealthKitManager's fetchSleepData now returns unspecifiedSleep as well
                 let (totalSleep, remSleep, coreSleep, deepSleep, unspecifiedSleep, awakeTime, firstSleep, lastSleep) = await healthKitManager.fetchSleepData(for: date)
-
+                
                 let sleepData = SleepData(
                     date: date,
                     totalSleepDuration: totalSleep,
@@ -163,20 +180,20 @@ class WeeklyViewModel: ObservableObject {
                 )
                 modelContext.insert(sleepData)
             }
-
+            
             if !missingDatesToFetch.isEmpty {
                 try modelContext.save()
             }
-
+            
             // --- Update ViewModel properties after all data is potentially refreshed ---
             self.weeklyData = try modelContext.fetch(currentWeekDescriptor) // Set current week's data for UI
             let dataForPrediction = try modelContext.fetch(previousWeekDescriptor) // Get previous week's data for ML
             
             self.predictionErrorMessage = nil // Clear any previous errors
-
+            
             // --- Call the prediction function with the PREVIOUS week's data ---
             calculatePredictedRestednessForNextWeek(basedOn: dataForPrediction)
-
+            
         } catch {
             print("Error fetching weekly data or previous week data: \(error.localizedDescription)")
             self.predictionErrorMessage = "Failed to load sleep data: \(error.localizedDescription)"
@@ -184,7 +201,7 @@ class WeeklyViewModel: ObservableObject {
             self.predictedRestednessForNextWeek = nil
         }
     }
-
+    
     // Helper to generate a range of dates
     private func weekDates(from startDate: Date, count: Int) -> [Date] {
         let calendar = Calendar.current
@@ -192,7 +209,7 @@ class WeeklyViewModel: ObservableObject {
             calendar.date(byAdding: .day, value: dayOffset, to: startDate)
         }
     }
-
+    
     // MARK: - Weekly Statistics (these still use `weeklyData`, which is the current week's data)
     // ... (Your existing statistic computed properties and formatter functions remain unchanged) ...
     
@@ -238,6 +255,12 @@ class WeeklyViewModel: ObservableObject {
         let total = validData.reduce(0) { $0 + $1.awakeDuration }
         return total / Double(validData.count)
     }
+    var averageUnspecifiedSleep: TimeInterval{
+        let validData = daysWithSleepData
+        guard !validData.isEmpty else { return 0 }
+        let total = validData.reduce(0) { $0 + $1.unspecifiedSleepDuration}
+        return total / Double(validData.count)
+    }
     
     var daysWithSleepCount: Int {
         daysWithSleepData.count
@@ -251,6 +274,13 @@ class WeeklyViewModel: ObservableObject {
     
     func getFormattedPercentage(for value: Double) -> String {
         String(format: "%.1f%%", value)
+    }
+    
+    func getFormattedRestednessPercentage(for score: Double) -> String { // score is an average of -1 to 1 values
+        // Convert score from -1 to 1 range to 0-100% range
+        let clampedScore = max(-1.0, min(1.0, score)) // Clamp average in case of any floating point oddities
+        let percentage = ((clampedScore + 1) / 2) * 100
+        return String(format: "%.0f%%", percentage)
     }
 }
 

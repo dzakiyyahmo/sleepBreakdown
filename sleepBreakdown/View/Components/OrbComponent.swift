@@ -43,6 +43,7 @@ enum OrbPreset {
     case ocean
     case cosmic
     case sunset
+    case arctic
     
     var configuration: OrbConfiguration {
         switch self {
@@ -65,6 +66,14 @@ enum OrbPreset {
                 glowColor: .red,
                 coreGlowIntensity: 0.8
             )
+            
+        case .arctic:
+            return OrbConfiguration(
+                backgroundColors: [.orange, .red, .pink],
+                glowColor: .red,
+                coreGlowIntensity: 3.1,
+                showShadow: false
+            )
         }
     }
 }
@@ -77,6 +86,7 @@ enum OrbPreset {
             CustomOrbComponent(preset: .ocean, size: 150)
             CustomOrbComponent(preset: .cosmic, size: 150)
             CustomOrbComponent(preset: .sunset, size: 150)
+            CustomOrbComponent(preset: .arctic, size: 150)
         }
         .padding()
     }

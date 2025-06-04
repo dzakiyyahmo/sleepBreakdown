@@ -10,6 +10,31 @@ class MonthlyViewModel: ObservableObject {
     @Published var monthlyData: [SleepData] = []
     @Published var currentMonthStart: Date
     
+    var orbPreset: OrbPreset {
+        let hoursOfSleep = averageSleepDuration / 3600
+        switch hoursOfSleep {
+        case 8...:
+            return .ocean
+        case 5..<8:
+            return .cosmic
+        default:
+            return .sunset
+        }
+    }
+    
+    var averageRestednessScore: Double {
+            guard !monthlyData.isEmpty else { return 0.0 } // Default to 0.0 (neutral on -1 to 1 scale) if no data
+
+            // Assuming SleepData.restednessScore is the -1 to 1 value
+            // And assuming all scores in monthlyData are valid user inputs.
+            // If '0' could mean "not set" from SleepData's default init AND it hasn't been filtered out before this point,
+            // you might need more sophisticated filtering if you don't want default 0s to skew the average.
+            // However, if RestednessInputView ensures a score is explicitly set, this should be fine.
+            let totalScore = monthlyData.reduce(0) { $0 + $1.restednessScore }
+            return totalScore / Double(monthlyData.count)
+        }
+
+    
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
         self.currentMonthStart = Calendar.current.startOfMonth(for: Date())
@@ -115,14 +140,14 @@ class MonthlyViewModel: ObservableObject {
         daysWithSleepData.reduce(0) { $0 + $1.totalSleepDuration }
     }
     
-//    var averageDeepSleepPercentage: Double {
-//        let validData = daysWithSleepData
-//        guard !validData.isEmpty else { return 0 }
-//        let percentages = validData.map { data in
-//            data.totalSleepDuration > 0 ? (data.deepSleepDuration / data.totalSleepDuration) * 100 : 0
-//        }
-//        return percentages.reduce(0, +) / Double(validData.count)
-//    }
+    //    var averageDeepSleepPercentage: Double {
+    //        let validData = daysWithSleepData
+    //        guard !validData.isEmpty else { return 0 }
+    //        let percentages = validData.map { data in
+    //            data.totalSleepDuration > 0 ? (data.deepSleepDuration / data.totalSleepDuration) * 100 : 0
+    //        }
+    //        return percentages.reduce(0, +) / Double(validData.count)
+    //    }
     
     var averageCoreSleep: TimeInterval {
         let validData = daysWithSleepData
@@ -151,6 +176,12 @@ class MonthlyViewModel: ObservableObject {
         let total = validData.reduce(0) { $0 + $1.awakeDuration }
         return total / Double(validData.count)
     }
+    var averageUnspecifiedSleep: TimeInterval {
+        let validData = daysWithSleepData
+        guard !validData.isEmpty else { return 0 }
+        let total = validData.reduce(0) { $0 + $1.unspecifiedSleepDuration}
+        return total / Double(validData.count)
+    }
     
     var daysWithSleepCount: Int {
         daysWithSleepData.count
@@ -165,4 +196,11 @@ class MonthlyViewModel: ObservableObject {
     func getFormattedPercentage(for value: Double) -> String {
         String(format: "%.1f%%", value)
     }
-} 
+    
+    func getFormattedRestednessPercentage(for score: Double) -> String {
+            // Converts a score from -1 to 1 range to 0-100% range for display
+            let clampedScore = max(-1.0, min(1.0, score)) // Ensure score is within expected bounds
+            let percentage = ((clampedScore + 1) / 2) * 100
+            return String(format: "%.0f%%", percentage)
+        }
+}

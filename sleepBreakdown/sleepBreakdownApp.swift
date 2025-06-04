@@ -11,6 +11,7 @@ import SwiftData
 @main
 struct SleepBreakdownApp: App {
     let container: ModelContainer
+    @AppStorage("hasOnboarded") var hasOnboarded: Bool = false
     
     init() {
         do {
@@ -22,25 +23,30 @@ struct SleepBreakdownApp: App {
     
     var body: some Scene {
         WindowGroup {
-            // Use TabView for navigation
-            TabView {
-                DailyView(modelContext: container.mainContext)
-                    .tabItem {
-                        Label("Daily", systemImage: "calendar")
-                    }
-                
-                // Use WeeklyView instead of a placeholder
-                WeeklyView(modelContext: container.mainContext)
-                    .tabItem {
-                        Label("Weekly", systemImage: "chart.bar")
-                    }
-                
-                // Placeholder for MonthlyView
-                MonthlyView(modelContext: container.mainContext)
-                    .tabItem {
-                        Label("Monthly", systemImage: "calendar.circle")
-                    }
+            if hasOnboarded {
+                // Use TabView for navigation
+                TabView {
+                   DailyView(modelContext: container.mainContext)
+                        .tabItem {
+                            Label("Daily", systemImage: "bed.double")
+                        }
+                    
+                    // Use WeeklyView instead of a placeholder
+                    WeeklyView(modelContext: container.mainContext)
+                        .tabItem {
+                            Label("Weekly", systemImage: "calendar")
+                        }
+                    
+                    // Placeholder for MonthlyView
+                    MonthlyView(modelContext: container.mainContext)
+                        .tabItem {
+                            Label("Monthly", systemImage: "calendar.badge.clock")
+                        }
+                }
+            } else {
+                OnboardingView(hasOnboarded: $hasOnboarded)
             }
+            
         }
         .modelContainer(container)
     }
